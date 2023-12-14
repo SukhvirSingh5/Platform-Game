@@ -4,32 +4,33 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    //Animation variables
+
     Animator anim;
     public bool moving = false;
 
-    //Movement Variables
-    Rigidbody2D rb; //create reference for rigidbody bc jump requires physics
-    public float jumpForce; //the force that will be added to the vertical component of player's velocity
+
+    Rigidbody2D rb;
+    public float jumpForce;
     public float speed;
 
-
-    //Ground Check Variables
-    public LayerMask groundLayer;//layer information
-    public Transform groundCheck;// player position info
+    private Vector3 respawnPoint;
+    public GameObject fallDetector;
+  
+    public LayerMask groundLayer;
+    public Transform groundCheck;
     public bool isGrounded;
 
     SpriteRenderer sprite;
 
-    // Start is called before the first frame update
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        respawnPoint = transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, .5f, groundLayer);
@@ -65,5 +66,19 @@ public class Player : MonoBehaviour
         anim.SetBool("isMoving", moving);
         transform.position = newPosition;
         transform.localScale = newScale;
+
+        fallDetector.transform.position = new Vector2(transform.position.x, fallDetector.transform.position.y);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "FallDetector")
+        {
+            transform.position = respawnPoint;
+        }
+  
+    }
+
+ 
+   
 }
